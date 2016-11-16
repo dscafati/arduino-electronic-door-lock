@@ -84,7 +84,7 @@ module.exports = function (grunt) {
                     expand: true,
                     cwd: 'assets/styles/sass',
                     dest: 'assets/styles',
-                    src: ['screen.scss'],
+                    src: ['styles.scss'],
                     ext: '.css'
                 }]
             }
@@ -107,11 +107,7 @@ module.exports = function (grunt) {
             site: {
                 path: 'http://localhost:3000',
                 app: 'chromium-browser'
-            },
-            editor: {
-                path: './',
-                app: 'WebStorm'
-            },
+            }
         },
 
         // Rev Config
@@ -258,7 +254,6 @@ module.exports = function (grunt) {
         'sass:dev',
         'express:dev',
         'open:site',
-        'open:editor',
         'watch'
     ]);
 
