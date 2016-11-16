@@ -4,25 +4,24 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Ds-loor-dock</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="styles/styles.css">
     </head>
     <body>
-        <header>
-            <a href="#" class="brand"></a>
-            <ul class="nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </header>
-
-        {{{ body }}}
-
-        <footer>
-           Footer Content 
-        </footer>
+        <div class="container">
+            {{{body}}}
+            <div class="row">
+                <div class="col-xs-12">
+                    <hr>
+                    <span class="pull-left">Taller de microcontroladores</span>
+                    <span class="pull-right">Facultad de Ciencias Exactas, Unicen, Tandil</span>
+                    </nav>
+                </div>
+            </div>
+        </div>
 
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="bower_components/bootstrap/dist/bootstrap.min.js"></script>
     </body>
 </html>

@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Menu</div>
+    <div class="panel-body">
+        <ul class="nav nav-pills nav-stacked">
+            <li {{#if tab_index}}class="active"{{/if}}><a href="/">Dashboard</a></li>
+            <li {{#if tab_claves}}class="active"{{/if}}><a href="/claves">Administrar claves</a></li>
+            <li {{#if tab_log}}class="active"{{/if}}><a href="/log">Ver registro de actividad completo</a></li>
+        </ul>
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">Estado de la puerta</div>
+    <div class="panel-body">
+        <p class="alert alert-info">Presione f5 para actualizar</p>
+        La puerta se encuentra {{#if is_door_opened }}<span class="text-danger">desbloqueada</span>{{else}}
+        <span class="text-success">bloqueada</span>{{/if}}
+    </div>
+</div>
