@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "body-parser": "^1.15.2",
+    "cli": "^1.0.1",
     "express": "~3.4.0",
     "express3-handlebars": "0.4.x",
-    "sqlite3": "^3.1.8"
+    "sqlite-sync": "^0.3.5"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

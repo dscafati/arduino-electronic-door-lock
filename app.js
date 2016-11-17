@@ -8,7 +8,12 @@ var app = express();
 var port = 3000;
 var fs = require('fs');
 var path = require('path');
+var storage = require('./storage');
+var db = storage.getDb();
+var bodyParser     =        require("body-parser");
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 /*
  * Use Handlebars for templating
  */
@@ -40,7 +45,35 @@ if (process.env.NODE_ENV === 'production') {
         // Default Layout and locate layouts and partials
         defaultLayout: 'main',
         layoutsDir: 'views/layouts/',
-        partialsDir: 'views/partials/'
+        partialsDir: 'views/partials/',
+        helpers: {
+            times: function(n, block) {
+                var accum = '';
+                for(var i = 0; i < n; ++i)
+                    accum += block.fn(i);
+                return accum;
+            },
+            inc: function(n){
+                return parseInt(n)+1;
+            },
+            ifEq : function(v1,v2, options){
+                if(v1 === v2) {
+                    return options.fn(this);
+                }
+                return options.inverse(this);
+            },
+            formatTime: function(value){
+                var h = Math.floor(value);
+                var m = (value - h);
+                m = Math.round(m * 60);
+                if (m < 10 ){
+                    m = "0" + m;
+                }else{
+                    m = m.toString();
+                }
+                return h + ":" + m + " hs";
+            }
+        }
     }));
 
     // Locate the views
@@ -54,47 +87,19 @@ if (process.env.NODE_ENV === 'production') {
 app.set('view engine', 'handlebars');
 
 
-// Database
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(':disk:');
 
-db.serialize(function() {
-    db.run("CREATE TABLE IF NOT EXISTS claves(id INTEGER PRIMARY KEY AUTOINCREMENT, codigo INT(4), user VARCHAR(255), h_desde FLOAT, h_hasta FLOAT);");
-    db.run("CREATE TABLE IF NOT EXISTS log(id INTEGER PRIMARY KEY AUTOINCREMENT, user VARCHAR(255), accion VARCHAR(255), date_time DATE_TIME default 'datetime(\'now\')');");
+function unformatTime(str){
+    var numbers = str.split(":");
+    var h = parseInt(numbers[0]);
+    var m = parseInt(numbers[1]) / 60;
 
-    /*
-    var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-    for (var i = 0; i < 10; i++) {
-        stmt.run("Ipsum " + i);
-    }
-    stmt.finalize();
+    return (h + m).toFixed(2);
 
-    db.each("SELECT rowid AS id, info FROM lorem", function(err, row) {
-        console.log(row.id + ": " + row.info);
-    });
-    */
-});
-
-db.close();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var dir = '/home/dscafati/Desktop/node/mock_data/';
+}
 function isDoorOpened(){
     var state = true;
     try{
-        fs.accessSync(dir + "door_opened.flag", fs.R_OK)
+        fs.accessSync(storage.getDir() + "door_opened.flag", fs.R_OK)
     }catch(e){
         state = false;
     }
@@ -110,37 +115,97 @@ app.get('/', function(request, response, next) {
     var args = {}
     args.tab_index = true;
     args.is_door_opened = isDoorOpened();
-
+    args.claves = db.run("SELECT * FROM claves ORDER BY id DESC LIMIT 3");
+    args.logs = db.run("SELECT * FROM log ORDER BY id DESC LIMIT 3");
 
     response.render('index', args);
 });
-// ABM Claves
-app.get('/claves', function(request, response, next) {
+// Claves
+app.all('/claves', function(request, response, next) {
     var args = {}
+    var page = (request.query.page) ? parseInt(request.query.page)-1 : 0;
+    var eachPage = 15;
     args.tab_claves = true;
     args.is_door_opened = isDoorOpened();
+    args.formErrors = [];
+    args.formSuccess = '';
+
+    if (request.method == 'POST'){
+        var user = request.body.user;
+        var code = parseInt(request.body.code);
+        var h_desde = request.body.h_desde;
+        var h_hasta = request.body.h_hasta;
+
+        var re = /([01]?[0-9]|2[0-3]):[0-5][0-9]/;
+
+        if (!user){
+            args.formErrors.push('Nombre de usuario obligatorio');
+        }
+        if (!code || code < 0 || code > 9999){
+            args.formErrors.push('Código inválido. Solo 4 digitos de 0000 a 9999');
+        }
+        if( !h_desde.match(re) ){
+            args.formErrors.push('Valor de "Hora desde" inválido');
+        }
+        if( !h_hasta.match(re) ){
+            args.formErrors.push('Valor de "Hora hasta" inválido');
+        }
+
+        if( unformatTime(h_hasta) <= unformatTime(h_desde) ){
+            args.formErros.push('El valor de "Hora hasta" debe ser menor que el valor de "Hora desde"');
+        }
+
+        if(args.formErrors.length==0){
+            var a2 = db.insert('claves',{user:user, codigo:code, h_desde: unformatTime(h_desde), h_hasta:unformatTime(h_hasta)}, function(response){
+                if(response.error){
+                    args.formErrors.push("Se ha producido un error, el código ya estaba en uso?");
+                }else{
+                    args.formSuccess = "Código agregado con éxito";
+                }
+            });
+        }
+
+    }
+
+    args.claves = db.run("SELECT * FROM claves ORDER BY id DESC LIMIT ?, ?", [page*eachPage, eachPage]);
+    var total = db.run("SELECT COUNT(*) AS total FROM claves")[0].total;
+
+    args.currentPage = page;
+    args.totalPages = Math.ceil(total/eachPage);
+    args.showPagination = args.totalPages > 0;
 
     response.render('claves', args);
 });
 // Log
 app.get('/log', function(request, response, next) {
     var args = {}
+    var page = (request.query.page) ? parseInt(request.query.page)-1 : 0;
+    var eachPage = 15;
     args.tab_log = true;
     args.is_door_opened = isDoorOpened();
 
+    args.logs = db.run("SELECT * FROM log ORDER BY id DESC LIMIT ?, ?", [page*eachPage, eachPage]);
+    var total = db.run("SELECT COUNT(*) AS total FROM log")[0].total;
+
+    args.currentPage = page;
+    args.totalPages = Math.ceil(total/eachPage);
+    args.showPagination = args.totalPages > 1;
 
     response.render('log', args);
 });
 // Borrar clave
 app.get('/delete', function(request, response, next) {
     var args = {}
-    response.redirect('/claves', args);
+    db.run("DELETE FROM claves WHERE id = '?'", [request.query.id]);
+    response.redirect('/claves');
 });
 // Vaciar log
 app.get('/erase', function(request, response, next) {
     var args = {}
 
-    response.redirect('/log', args);
+    //db.run('DELETE FROM log');
+    //db.close();
+    response.redirect('/log');
 });
 
 

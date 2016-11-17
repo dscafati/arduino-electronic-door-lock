@@ -20,7 +20,14 @@
                 <th>Valido hasta:</th>
                 </thead>
                 <tbody>
-                <tr><td>Test</td><td>8938</td><td>15:00</td><td>16:00</td></tr>
+                {{#each claves}}
+                    <tr>
+                        <td>{{this.user}}</td>
+                        <td>{{this.codigo}}</td>
+                        <td>{{formatTime this.h_desde}}</td>
+                        <td>{{formatTime this.h_hasta}}</td>
+                    </tr>
+                {{/each}}
                 </tbody>
             </table>
         </div>
@@ -31,12 +38,17 @@
             <table class="table table-striped table-condensed table-responsive">
                 <thead>
                 <th>Usuario</th>
-                <th>Codigo</th>
                 <th>Accion</th>
                 <th>Fecha y hora</th>
                 </thead>
                 <tbody>
-                <tr><td>Test</td><td>8938</td><td>Abrio la puerta</td><td>2016-0-2-21316:00</td></tr>
+                    {{#each logs}}
+                        <tr>
+                            <td>{{this.user}}</td>
+                            <td>{{this.accion}}</td>
+                            <td>{{this.date_time}}</td>
+                        </tr>
+                    {{/each}}
                 </tbody>
             </table>
         </div>

@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="page-header">
-            <h1>Admin <small>Dashboard</small></h1>
+            <h1>Admin <small>Claves</small></h1>
         </div>
     </div>
 </div>
@@ -12,55 +12,116 @@
     <div class="col-xs-12 col-sm-8">
 
         <div class="panel panel-default">
+            <div class="panel-heading">Agregar Clave</div>
             <div class="panel-body">
-                <div class="pull-right">
-                    <a href="/agregar_clave" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Agregar clave</a>
-                </div>
+                {{#each formErrors}}
+                    <p class="alert alert-danger">
+                        <i class="glyphicon glyphicon-alert"></i> {{this}}
+                    </p>
+                {{/each}}
+                {{#if formSuccess}}
+                    <p class="alert alert-success">
+                        {{formSuccess}}
+                    </p>
+                {{/if}}
+                <form method="POST" action="/claves">
+                    <div class="form-group">
+                        <label for="user">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="user" name="user" placeholder="Nombre de usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Codigo</label>
+                        <input type="number" class="form-control" id="code" name="code" maxlength="4" min="0" max="9999" placeholder="">
+                        <p class="help-block">4 dígitos numéricos</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="from">Hora desde:</label>
+                        <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+                            <input type="text" class="form-control" id="from" name="h_desde" value="00:00">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">Hora hasta:</label>
+                        <div class="input-group clockpicker" data-placement="top" data-align="top" data-autoclose="true">
+                            <input type="text" class="form-control" id="to" name="h_hasta" value="23:59">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        jQuery(function(){
+                            jQuery('.clockpicker').clockpicker();
+                        });
+                    </script>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-heading">Ultimas claves</div>
+            <div class="panel-heading">Claves de acceso</div>
             <table class="table table-striped table-condensed table-responsive">
                 <thead>
-                    <th>Usuario</th>
-                    <th>Codigo</th>
-                    <th>Valido desde:</th>
-                    <th>Valido hasta:</th>
-                    <th></th>
+                <th>Usuario</th>
+                <th>Codigo</th>
+                <th>Valido desde:</th>
+                <th>Valido hasta:</th>
+                <th>Acción</th>
                 </thead>
                 <tbody>
+                <tr>
+                {{#each claves}}
                     <tr>
-                        <td>Test</td>
-                        <td>8938</td>
-                        <td>15:00</td>
-                        <td>16:00</td>
+                        <td>{{this.user}}</td>
+                        <td>{{this.codigo}}</td>
+                        <td>{{formatTime this.h_desde}}</td>
+                        <td>{{formatTime this.h_hasta}}</td>
                         <td>
-                            <a class="btn btn-danger" href="/delete"><i class="glyphicon glyphicon-remove-circle"></i> Borrar</a>
+                            <a href="/delete?id={{this.id}}" class="btn btn-danger btn-xs">
+                                <i class="glyphicon glyphicon-remove-circle"></i> Borrar
+                            </a>
                         </td>
                     </tr>
+                {{/each}}
+                </tr>
                 </tbody>
             </table>
-            <div class="panel-body text-center">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li>
-                            <a href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li>
-                            <a href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+            {{#if showPagination}}
+                <div class="panel-footer">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            {{#ifEq 0 currentPage}}
+                                <li class="disabled"><span aria-hidden="true">&laquo;</span></li>
+                            {{else}}
+                                <li>
+                                    <a href="/claves?page={{currentPage}}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            {{/ifEq}}
+                            {{#times totalPages}}
+                                <li {{#ifEq this ../currentPage}}class="active"{{/ifEq}}>
+                                    <a href="/claves?page={{inc this}}">
+                                        {{inc this}}
+                                    </a>
+                                </li>
+                            {{/times}}
+                            {{#ifEq totalPages (inc currentPage)}}
+                                <li class="disabled"><span aria-hidden="true">&raquo;</span></li>
+                            {{else}}
+                                <li>
+                                    <a href="/claves?page={{inc (inc currentPage) }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            {{/ifEq}}
+                        </ul>
+                    </nav>
+                </div>
+            {{/if}}
         </div>
 
     </div>

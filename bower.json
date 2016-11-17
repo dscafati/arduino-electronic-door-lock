@@ -2,7 +2,8 @@
   "name": "ds-loor-dock",
   "version": "0.0.0",
   "dependencies": {
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "clockpicker": "^0.0.7"
   },
   "devDependencies": {}
 }
