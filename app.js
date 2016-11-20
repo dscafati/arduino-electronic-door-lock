@@ -114,7 +114,7 @@ exec(cmd);
 db.runAsync("SELECT * FROM claves", function(rows){
 
     rows.forEach(function(row){
-        var cmd = "redis-cli set " + row.codigo + " valid";
+        var cmd = "redis-cli set " + row.codigo + " " + row.h_desde + ":" + row.h_hasta;
         exec(cmd, function(error, stdout, stderr) {});
     })
 });
@@ -175,6 +175,7 @@ app.all('/claves', function(request, response, next) {
                     args.formErrors.push("Se ha producido un error, el código ya estaba en uso?");
                 }else{
                     args.formSuccess = "Código agregado con éxito";
+                    exec("redis-cli set " + code + " " + unformatTime(h_desde) + ":" + unformatTime(h_hasta));
                 }
             });
         }
@@ -210,7 +211,8 @@ app.get('/log', function(request, response, next) {
 // Borrar clave
 app.get('/delete', function(request, response, next) {
     var args = {}
-    db.run("DELETE FROM claves WHERE id = '?'", [request.query.id]);
+    db.run("DELETE FROM claves WHERE codigo = '?'", [request.query.code]);
+    exec("redis-cli del " + request.query.code)
     response.redirect('/claves');
 });
 // Vaciar log

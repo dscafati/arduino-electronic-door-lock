@@ -1,7 +1,7 @@
 var exports = module.exports = {}
 
 var sqlite = require('sqlite-sync');
-var dir = '/home/dscafati/Desktop/node/mock_data/';
+var dir = '/home/dscafati/Desktop/node/data/';
 
 sqlite.connect(dir + 'data.db');
 
