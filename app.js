@@ -11,6 +11,8 @@ var path = require('path');
 var storage = require('./storage');
 var db = storage.getDb();
 var bodyParser     =        require("body-parser");
+var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -97,14 +99,26 @@ function unformatTime(str){
 
 }
 function isDoorOpened(){
+
+    var cmd = "redis-cli get door_flag";
     var state = true;
-    try{
-        fs.accessSync(storage.getDir() + "door_opened.flag", fs.R_OK)
-    }catch(e){
-        state = false;
-    }
+    var redis = execSync(cmd).toString();
+    state = !!redis;
     return state;
 }
+
+// On start: Load existing keys on memory
+var cmd = "redis-cli flushall";
+exec(cmd);
+
+db.runAsync("SELECT * FROM claves", function(rows){
+
+    rows.forEach(function(row){
+        var cmd = "redis-cli set " + row.codigo + " valid";
+        exec(cmd, function(error, stdout, stderr) {});
+    })
+});
+
 
 
 /*
