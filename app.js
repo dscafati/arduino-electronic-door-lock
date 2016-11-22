@@ -194,7 +194,7 @@ app.all('/claves', function(request, response, next) {
 // Log
 app.get('/log', function(request, response, next) {
     var args = {}
-    var page = (request.query.page) ? parseInt(request.query.page)-1 : 0;
+    var page = (request.query.page > 0) ? parseInt(request.query.page)-1 : 0;
     var eachPage = 15;
     args.tab_log = true;
     args.is_door_opened = isDoorOpened();
