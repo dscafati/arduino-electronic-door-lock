@@ -9,10 +9,25 @@
     </div>
 </div>
 <div class="panel panel-default">
-    <div class="panel-heading">Estado de la puerta</div>
+    <div class="panel-heading">Estado</div>
     <div class="panel-body">
         <p class="alert alert-info">Presione f5 para actualizar</p>
-        La puerta se encuentra {{#if is_door_opened }}<span class="text-danger">desbloqueada</span>{{else}}
-        <span class="text-success">bloqueada</span>{{/if}}
+        <p>
+            La puerta se encuentra {{#if is_door_opened }}<span class="text-danger">desbloqueada</span>{{else}}
+            <span class="text-success">bloqueada</span>{{/if}}
+        </p>
+        <p><b>Hora del sistema:</b> {{time}}</p>
+        <a href="#" id="syncButton" class="btn btn-warning btn-block">Sincronizar reloj</a>
+        <script>
+            jQuery(function(){
+                jQuery("#syncButton").click(function(e){
+                    var date = new Date();
+                    var time = date.getTime() / 1000 | 0;
+                    var timezoneOffset = date.getTimezoneOffset()*60;
+                    jQuery.post('/sync',{time:time, timezone:timezoneOffset}, function(){window.location.reload();});
+                    e.preventDefault();
+                });
+            });
+        </script>
     </div>
 </div>

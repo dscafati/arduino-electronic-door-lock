@@ -1,7 +1,7 @@
 var exports = module.exports = {}
 
 var sqlite = require('sqlite-sync');
-var dir = '/home/dscafati/Desktop/node/data/';
+var dir = './data/';
 
 sqlite.connect(dir + 'data.db');
 
@@ -16,5 +16,9 @@ exports.getDb = function(){
     return sqlite;
 }
 
+exports.refresh = function(){
+    sqlite.close();
+    sqlite.connect(dir + 'data.db');
+}
 
 return module.exports;

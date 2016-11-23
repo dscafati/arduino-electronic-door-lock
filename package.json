@@ -7,6 +7,7 @@
     "cli": "^1.0.1",
     "express": "~3.4.0",
     "express3-handlebars": "0.4.x",
+    "moment": "^2.17.0",
     "redis": "^2.6.3",
     "sqlite-sync": "^0.3.5"
   },

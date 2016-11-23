@@ -13,6 +13,7 @@ var db = storage.getDb();
 var bodyParser     =        require("body-parser");
 var exec = require('child_process').exec;
 var execSync = require('child_process').execSync;
+var moment = require('moment');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -129,6 +130,9 @@ app.get('/', function(request, response, next) {
     var args = {}
     args.tab_index = true;
     args.is_door_opened = isDoorOpened();
+    args.time = moment().format('DD/MMMM/YYYY, HH:mm:ss');
+    storage.refresh();
+
     args.claves = db.run("SELECT * FROM claves ORDER BY id DESC LIMIT 3");
     args.logs = db.run("SELECT * FROM log ORDER BY id DESC LIMIT 3");
 
@@ -140,6 +144,7 @@ app.all('/claves', function(request, response, next) {
     var page = (request.query.page) ? parseInt(request.query.page)-1 : 0;
     var eachPage = 15;
     args.tab_claves = true;
+    args.time = moment().format('DD/MMMM/YYYY, HH:mm:ss');
     args.is_door_opened = isDoorOpened();
     args.formErrors = [];
     args.formSuccess = '';
@@ -197,9 +202,13 @@ app.get('/log', function(request, response, next) {
     var page = (request.query.page > 0) ? parseInt(request.query.page)-1 : 0;
     var eachPage = 15;
     args.tab_log = true;
+    args.time = moment().format('DD/MMMM/YYYY, HH:mm:ss');
     args.is_door_opened = isDoorOpened();
 
+    storage.refresh();
+
     args.logs = db.run("SELECT * FROM log ORDER BY id DESC LIMIT ?, ?", [page*eachPage, eachPage]);
+
     var total = db.run("SELECT COUNT(*) AS total FROM log")[0].total;
 
     args.currentPage = page;
@@ -219,9 +228,15 @@ app.get('/delete', function(request, response, next) {
 app.get('/erase', function(request, response, next) {
     var args = {}
 
-    //db.run('DELETE FROM log');
-    //db.close();
+    db.run('DELETE FROM log');
     response.redirect('/log');
+});
+// Sincronizar hora
+app.post('/sync', function(request, response, next) {
+    var time = request.body.time;
+    var timezone = request.body.timezone;
+    exec("date +%s -s @" + (time-timezone));
+    response.end();
 });
 
 
