@@ -11,6 +11,7 @@ Developed for the subject "Taller de microcontroladores", Facultad de Ciencias E
 **Development:**
 
      npm install
+     bower install
 
 **All-days usage:**
 
@@ -21,3 +22,4 @@ Developed for the subject "Taller de microcontroladores", Facultad de Ciencias E
 Clone to a new folder and then run:
 
      npm install --production
+     bower install
