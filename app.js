@@ -102,10 +102,8 @@ function unformatTime(str){
 function isDoorOpened(){
 
     var cmd = "redis-cli get door_flag";
-    var state = true;
     var redis = execSync(cmd).toString();
-    state = !!redis;
-    return state;
+    return redis=="true\n";
 }
 
 // On start: Load existing keys on memory
@@ -171,7 +169,7 @@ app.all('/claves', function(request, response, next) {
         }
 
         if( unformatTime(h_hasta) <= unformatTime(h_desde) ){
-            args.formErros.push('El valor de "Hora hasta" debe ser menor que el valor de "Hora desde"');
+            args.formErrors.push('El valor de "Hora hasta" debe ser menor que el valor de "Hora desde"');
         }
 
         if(args.formErrors.length==0){

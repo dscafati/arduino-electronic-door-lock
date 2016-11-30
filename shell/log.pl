@@ -13,6 +13,10 @@ if(@ARGV[0] eq "a"){
     $accion='Abrió la puerta';
 	$user = run("select user from claves where codigo = @ARGV[1];");
 }
+if(@ARGV[0] eq "u"){
+    $accion='Desbloqueó la puerta';
+	$user = run("select user from claves where codigo = @ARGV[1];");
+}
 if(@ARGV[0] eq "c"){
     $accion='Puerta cerrada';
 }
