@@ -17,5 +17,6 @@ All-days usage:
      grunt workon
 
 Production (just to upload to the board)
+Clone to a new folder and then run:
 
      npm install --production
