@@ -8,15 +8,16 @@ Developed for the subject "Taller de microcontroladores", Facultad de Ciencias E
 
 # Usage
 
-Development:
+**Development:**
 
      npm install
 
-All-days usage:
+**All-days usage:**
 
      grunt workon
 
-Production (just to upload to the board)
+**Production (just to upload to the board)**
+
 Clone to a new folder and then run:
 
      npm install --production
