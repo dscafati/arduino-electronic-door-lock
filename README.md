@@ -23,3 +23,6 @@ Clone to a new folder and then run:
 
      npm install --production
      bower install
+
+# Doc
+[guide_es-ar](https://github.com/dscafati/arduino-electronic-door-lock/blob/master/doc/guide_es-ar.pdf)
